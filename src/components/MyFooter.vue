@@ -32,9 +32,11 @@ export default {
   },
   methods: {
     clearAll() {
-      console.log(this);
-      this.$emit("clearAllTodo");
+      this.$emit('clearAllTodo');
     },
+  },
+  beforeDestroy() {
+    this.$off('clearAllTodo')
   },
 };
 </script>

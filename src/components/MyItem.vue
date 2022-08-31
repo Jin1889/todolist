@@ -11,13 +11,13 @@
 <script>
 export default {
     name: "MyItem",
-    props: ['todo', 'checkTodo', 'deleteTodo'],
+    props: ['todo'],
     methods: {
         handleCheck(id){
-            this.checkTodo(id)
+            this.$bus.$emit('checkTodo', id)
         },
         handleDelete(id){
-            this.deleteTodo(id)
+            this.$bus.$emit('deleteTodo', id)
         }
     },
 };
