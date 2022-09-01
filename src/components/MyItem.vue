@@ -1,26 +1,55 @@
 <template>
   <li>
     <label>
-      <input type="checkbox" :checked="todo.done" @change="handleCheck(todo.id)" />
-      <span>{{todo.title}}</span>
+      <input
+        type="checkbox"
+        :checked="todo.done"
+        @change="handleCheck(todo.id)"
+      />
+      <span v-show="!todo.isEdit">{{ todo.title }}</span>
+      <input
+        type="text"
+        v-show="todo.isEdit"
+        :value="todo.title"
+        @blur="handleBlur(todo, $event)"
+        ref="inputTitle"
+      />
     </label>
     <button class="btn btn-danger" @click="handleDelete(todo.id)">删除</button>
+    <button v-show="!todo.isEdit" class="btn btn-edit" @click="handleEdit(todo)">编辑</button>
   </li>
 </template>
 
 <script>
-import pubsub from 'pubsub-js'
+import pubsub from "pubsub-js";
 export default {
-    name: "MyItem",
-    props: ['todo'],
-    methods: {
-        handleCheck(id){
-            this.$bus.$emit('checkTodo', id)
-        },
-        handleDelete(id){
-            pubsub.publish('deleteTodo', id)
-        }
+  name: "MyItem",
+  props: ["todo"],
+  methods: {
+    handleCheck(id) {
+      this.$bus.$emit("checkTodo", id);
     },
+    handleDelete(id) {
+      if (confirm("确定删除码?")) {
+        pubsub.publish("deleteTodo", id);
+      }
+    },
+    handleEdit(todo) {
+      if (todo.hasOwnProperty("isEdit")) {
+        todo.isEdit = true;
+      } else {
+        this.$set(todo, "isEdit", true);
+      }
+      this.$nextTick(function(){
+        this.$refs.inputTitle.focus()
+      })
+    },
+    handleBlur(todo, e){
+      todo.isEdit = false
+      if(!e.target.value.trim()) return alert('输入不能为空!')
+      this.$bus.$emit('updateTodo', todo.id, e.target.value)
+    }
+  },
 };
 </script>
 
@@ -60,11 +89,11 @@ li:last-child {
   border-bottom: none;
 }
 
-li:hover{
-    background-color: #ddd;
+li:hover {
+  background-color: #ddd;
 }
 
-li:hover button{
-    display: block;
+li:hover button {
+  display: block;
 }
 </style>
