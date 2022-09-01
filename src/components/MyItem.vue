@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import pubsub from 'pubsub-js'
 export default {
     name: "MyItem",
     props: ['todo'],
@@ -17,7 +18,7 @@ export default {
             this.$bus.$emit('checkTodo', id)
         },
         handleDelete(id){
-            this.$bus.$emit('deleteTodo', id)
+            pubsub.publish('deleteTodo', id)
         }
     },
 };

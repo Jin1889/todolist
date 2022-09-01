@@ -3,7 +3,7 @@
     <div class="todo-container">
       <div class="todo-wrap">
         <MyHeader :addTodo="addTodo" />
-        <MyList :todos="todos" :checkTodo="checkTodo" :deleteTodo="deleteTodo" />
+        <MyList :todos="todos" />
         <MyFooter :todos="todos" @checkAllTodo="checkAllTodo" @clearAllTodo="clearAllTodo" />
       </div>
     </div>
@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import pubsub from 'pubsub-js'
 import MyHeader from "./components/MyHeader.vue";
 import MyList from "./components/MyList.vue";
 import MyFooter from "./components/MyFooter.vue";
@@ -36,7 +37,7 @@ export default {
         if(todo.id === id) todo.done = !todo.done
       })
     },
-    deleteTodo(id){
+    deleteTodo(_,id){
       this.todos = this.todos.filter(todo => todo.id !== id)
     },
     checkAllTodo(done){
@@ -57,11 +58,11 @@ export default {
   },
   mounted() {
     this.$bus.$on('checkTodo', this.checkTodo)
-    this.$bus.$on('deleteTodo', this.deleteTodo)
+    this.pubId = pubsub.subscribe('deleteTodo', this.deleteTodo)
   },
   beforeDestroy() {
     this.$bus.$off('checkTodo')
-    this.$bus.$off('deleteTodo')
+    pubsub.unsubscribe(this.pubId)
   },
 };
 </script>
